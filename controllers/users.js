@@ -6,6 +6,23 @@ const jwt = require('jsonwebtoken');
 
 const SALT_LENGTH = 14;
 
+
+
+router.post('/signup', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        
+        const hashedPassword = bcrypt.hashSync(password, SALT_LENGTH);
+        
+        const newUser = new User({ username, hashedPassword });
+        await newUser.save();
+        
+        res.status(201).json({ message: 'User created successfully.' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 router.post('signin', async (req, res) => {
     try {
         const user = await User.findOne({
@@ -21,5 +38,13 @@ router.post('signin', async (req, res) => {
         }
     } catch (error) {
         res.status(400).json({ error: error.message });
+    }
+});
+
+router.post('/logout', (req, res) => {
+    try {
+        res.status(200).json({ message: 'User logged out successfully.' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 });
