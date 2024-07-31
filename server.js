@@ -1,15 +1,14 @@
 const dotenv = require('dotenv');
 dotenv.config();
+const cors = require('cors');
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
-const cors = require('cors');
-
 
 const testJWTRouter = require('./controllers/test-jwt');
 const usersRouter = require('./controllers/users');
 const profilesRouter = require('./controllers/profiles');
-const hootsRouter = require('./controllers/hoots');
+const blogPostsRouter = require('./controllers/blogPosts');
 
 mongoose.connect(process.env.MONGODB_URI);
 
@@ -23,7 +22,7 @@ app.use(cors())
 app.use('/test-jwt', testJWTRouter);
 app.use('/users', usersRouter);
 app.use('/profiles', profilesRouter);
-app.use('/hoots', hootsRouter);
+app.use('/posts', blogPostsRouter);
 
 // Routes go here
 

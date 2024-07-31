@@ -10,16 +10,20 @@ const SALT_LENGTH = 14;
 
 router.post('/signup', async (req, res) => {
     try {
-        const { username, password } = req.body;
-        
-        const hashedPassword = bcrypt.hashSync(password, SALT_LENGTH);
-        
-        const newUser = new User({ username, hashedPassword });
-        await newUser.save();
-        
-        res.status(201).json({ message: 'User created successfully.' });
+        // Check if the username is already taken
+        const userInDatabase = await User.findOne({ username: req.body.username });
+        if (userInDatabase) {
+            return res.json({error: 'Username already taken.'});
+        }
+        // Create a new user with hashed password
+        const user = await User.create({
+            username: req.body.username,
+            hashedPassword: bcrypt.hashSync(req.body.password, SALT_LENGTH)
+        })
+        const token = jwt.sign({ username: user.username, _id: user._id }, process.env.JWT_SECRET);
+        res.status(201).json({ user, token });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(400).json({ error: error.message });
     }
 });
 
@@ -48,3 +52,5 @@ router.post('/logout', (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+module.exports = router;
