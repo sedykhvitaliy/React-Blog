@@ -44,4 +44,50 @@ router.post('/', async (req, res) => {
     }
 });
 
+
+
+router.put('/:hootId', async (req, res) => {
+  try {
+    const blogPost = await BlogPost.findById(req.params.hootId);
+
+    if (!blogPost) {
+      return res.status(404).json({ message: 'Blog post not found' });
+    }
+
+    if (!blogPost.author.equals(req.user._id)) {
+      return res.status(403).send("You're not allowed to do that!");
+    }
+
+    const updatedBlogPost = await BlogPost.findByIdAndUpdate(
+      req.params.hootId,
+      req.body,
+      { new: true }
+    ).populate('author');
+
+    res.status(200).json(updatedBlogPost);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
+router.delete('/:hootId', async (req, res) => {
+  try {
+    const blogPost = await BlogPost.findById(req.params.hootId);
+
+    if (!blogPost) {
+      return res.status(404).json({ message: 'Blog post not found' });
+    }
+
+    if (!blogPost.author.equals(req.user._id)) {
+      return res.status(403).send("You're not allowed to do that!");
+    }
+
+    await BlogPost.findByIdAndDelete(req.params.hootId);
+
+    res.status(200).json({ message: 'Blog post deleted successfully' });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
 module.exports = router;
