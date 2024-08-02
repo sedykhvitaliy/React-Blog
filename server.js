@@ -10,6 +10,8 @@ const usersRouter = require('./controllers/users');
 const profilesRouter = require('./controllers/profiles');
 const blogPostsRouter = require('./controllers/blogPosts');
 
+const PORT = process.env.PORT ? process.env.PORT : 3000;
+
 mongoose.connect(process.env.MONGODB_URI);
 
 mongoose.connection.on('connected', () => {
@@ -26,6 +28,6 @@ app.use('/posts', blogPostsRouter);
 
 // Routes go here
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
   console.log('The express app is ready!');
 });
