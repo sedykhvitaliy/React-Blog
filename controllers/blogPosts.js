@@ -8,19 +8,19 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
-      const hoots = await Hoot.find({})
+      const blogPosts = await BlogPost.find({})
         .populate('author')
         .sort({ createdAt: 'desc' });
-      res.status(200).json(hoots);
+      res.status(200).json(blogPosts);
     } catch (error) {
       res.status(500).json(error);
     }
   });
 
-router.get('/:hootId', async (req, res) => {
+router.get('/:blogPostId', async (req, res) => {
     try {
-      const hoot = await Hoot.findById(req.params.hootId).populate('author');
-      res.status(200).json(hoot);
+      const blogPost = await BlogPost.findById(req.params.blogPostId).populate('author');
+      res.status(200).json(blogPost);
     } catch (error) {
       res.status(500).json(error);
     }
@@ -46,9 +46,9 @@ router.post('/', async (req, res) => {
 
 
 
-router.put('/:hootId', async (req, res) => {
+router.put('/:blogPostId', async (req, res) => {
   try {
-    const blogPost = await BlogPost.findById(req.params.hootId);
+    const blogPost = await BlogPost.findById(req.params.blogPostId);
 
     if (!blogPost) {
       return res.status(404).json({ message: 'Blog post not found' });
@@ -59,7 +59,7 @@ router.put('/:hootId', async (req, res) => {
     }
 
     const updatedBlogPost = await BlogPost.findByIdAndUpdate(
-      req.params.hootId,
+      req.params.blogPostId,
       req.body,
       { new: true }
     ).populate('author');
@@ -70,9 +70,9 @@ router.put('/:hootId', async (req, res) => {
   }
 });
 
-router.delete('/:hootId', async (req, res) => {
+router.delete('/:blogPostId', async (req, res) => {
   try {
-    const blogPost = await BlogPost.findById(req.params.hootId);
+    const blogPost = await BlogPost.findById(req.params.blogPostId);
 
     if (!blogPost) {
       return res.status(404).json({ message: 'Blog post not found' });
@@ -82,12 +82,30 @@ router.delete('/:hootId', async (req, res) => {
       return res.status(403).send("You're not allowed to do that!");
     }
 
-    await BlogPost.findByIdAndDelete(req.params.hootId);
+    await BlogPost.findByIdAndDelete(req.params.blogPostId);
 
     res.status(200).json({ message: 'Blog post deleted successfully' });
   } catch (error) {
     res.status(500).json(error);
   }
 });
+
+router.post('/:blogPostId/comments', async (req, res) => {
+  try {
+    req.body.author = req.user._id;
+    const blogPost = await BlogPost.findById(req.params.blogPostId);
+    blogPost.comments.push(req.body);
+    await blogPost.save();
+
+    const newComment = blogPost.comments[blogPost.comments.length - 1];
+
+    newComment._doc.author = req.user;
+
+    res.status(201).json(newComment);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
 
 module.exports = router;
