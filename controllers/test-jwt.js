@@ -16,13 +16,13 @@ router.get('/sign-token', (req, res) => {
 
 router.post('/verify-token', (req, res) => {
     const token = req.headers.authorization.split(' ')[1];
-        // Add in verify method
-        try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            res.json({ decoded });
-        } catch (error) {
-            res.status(401).json({ error: 'Invalid token.' });
-        }
+    // Add in verify method
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        res.json({ decoded });
+    } catch (error) {
+        res.status(401).json({ error: 'Invalid token.' });
+    }
 });
 
 module.exports = router;

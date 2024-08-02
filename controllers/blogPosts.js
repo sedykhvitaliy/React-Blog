@@ -7,24 +7,24 @@ const router = express.Router();
 //Public Routes (for users and guests)
 
 router.get('/', async (req, res) => {
-    try {
-      const blogPosts = await BlogPost.find({})
-        .populate('author')
-        .sort({ createdAt: 'desc' });
-      res.status(200).json(blogPosts);
-    } catch (error) {
-      res.status(500).json(error);
-    }
-  });
+  try {
+    const blogPosts = await BlogPost.find({})
+      .populate('author')
+      .sort({ createdAt: 'desc' });
+    res.status(200).json(blogPosts);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
 
 router.get('/:blogPostId', async (req, res) => {
-    try {
-      const blogPost = await BlogPost.findById(req.params.blogPostId).populate('author');
-      res.status(200).json(blogPost);
-    } catch (error) {
-      res.status(500).json(error);
-    }
-  });  
+  try {
+    const blogPost = await BlogPost.findById(req.params.blogPostId).populate('author');
+    res.status(200).json(blogPost);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
 
 
 
@@ -33,15 +33,15 @@ router.get('/:blogPostId', async (req, res) => {
 router.use(verifyToken);
 
 router.post('/', async (req, res) => {
-    try {
-        req.body.author = req.user._id;
-        const blogPost = await BlogPost.create(req.body);
-        blogPost._doc.author = req.user;
-        res.status(201).json(blogPost);
-    } catch (error) {
-        console.log(error);
-        res.status(500).json(error);
-    }
+  try {
+    req.body.author = req.user._id;
+    const blogPost = await BlogPost.create(req.body);
+    blogPost._doc.author = req.user;
+    res.status(201).json(blogPost);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
 });
 
 
